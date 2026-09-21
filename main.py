@@ -1,5 +1,4 @@
-"""Точка входа в Application Track Service."""
-
+from categories import load_categories, show_categories
 from employees import (
     add_employee,
     find_employees,
@@ -14,6 +13,7 @@ from requests import (
     show_requests,
     sort_requests,
 )
+from statuses import load_statuses, show_statuses
 from storage import (
     load_employees,
     load_requests,
@@ -35,6 +35,8 @@ def show_menu() -> None:
     print("7. Отменить заявление")
     print("8. Сортировать заявления")
     print("9. Статистика")
+    print("10. Показать категории")
+    print("11. Показать статусы")
     print("0. Выход")
 
 
@@ -42,13 +44,15 @@ def main() -> None:
     """Запустить основной цикл приложения."""
     employees = load_employees("data/employees.json")
     requests = load_requests("data/requests.json")
+    categories = load_categories("data/categories.json")
+    statuses = load_statuses("data/statuses.json")
 
     while True:
         show_menu()
 
         choice = input_choice(
             "Выберите действие: ",
-            {str(i) for i in range(10)},
+            {str(i) for i in range(12)},
         )
 
         if choice == "0":
@@ -83,7 +87,6 @@ def main() -> None:
 
         elif choice == "4":
             employee_id = input_int("Введите ID сотрудника: ", 1)
-
             request_choice = input_choice(
                 "Тип заявления "
                 "(1-отпуск, 2-перевод, 3-увольнение, 4-прием): ",
@@ -97,9 +100,7 @@ def main() -> None:
                     employee_id,
                     request_choice,
                 )
-
                 save_requests("data/requests.json", requests)
-
                 print("\nЗаявление создано.")
                 print(f"Номер заявления: {request['id']}")
                 print(f"Тип: {request['type']}")
@@ -120,7 +121,6 @@ def main() -> None:
 
         elif choice == "7":
             request_id = input_int("Введите номер заявления: ", 1)
-
             try:
                 cancel_request(requests, request_id)
                 save_requests("data/requests.json", requests)
@@ -138,13 +138,17 @@ def main() -> None:
 
         elif choice == "9":
             statistics = get_request_statistics(requests)
-
             print("\n=== СТАТИСТИКА ===")
             print(f"Всего сотрудников: {len(employees)}")
             print(f"Всего заявлений: {len(requests)}")
-
             for key, value in statistics.items():
                 print(f"{key}: {value}")
+
+        elif choice == "10":
+            show_categories(categories)
+
+        elif choice == "11":
+            show_statuses(statuses)
 
 
 if __name__ == "__main__":
