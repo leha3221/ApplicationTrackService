@@ -43,7 +43,7 @@ def show_menu() -> None:
 def main() -> None:
     """Запустить основной цикл приложения."""
     employees = load_employees("data/employees.json")
-    requests = load_requests("data/requests.json")
+    requests = load_requests("data/requests.json", employees)
     categories = load_categories("data/categories.json")
     statuses = load_statuses("data/statuses.json")
 
@@ -76,7 +76,7 @@ def main() -> None:
             )
 
             save_employees("data/employees.json", employees)
-            print(f"Сотрудник добавлен. ID: {employee['id']}")
+            print(f"Сотрудник добавлен. ID: {employee.id}")
 
         elif choice == "3":
             query = input_non_empty(
@@ -102,22 +102,22 @@ def main() -> None:
                 )
                 save_requests("data/requests.json", requests)
                 print("\nЗаявление создано.")
-                print(f"Номер заявления: {request['id']}")
-                print(f"Тип: {request['type']}")
-                print(f"Статус: {request['status']}")
+                print(f"Номер заявления: {request.id}")
+                print(f"Тип: {request.type}")
+                print(f"Статус: {request.status}")
 
             except ValueError as error:
                 print(f"Ошибка: {error}")
 
         elif choice == "5":
-            show_requests(requests, employees)
+            show_requests(requests)
 
         elif choice == "6":
             query = input_non_empty(
                 "Введите ФИО, тип или статус для поиска: "
             )
-            found = find_requests(requests, employees, query)
-            show_requests(found, employees)
+            found = find_requests(requests, query)
+            show_requests(found)
 
         elif choice == "7":
             request_id = input_int("Введите номер заявления: ", 1)
@@ -134,7 +134,7 @@ def main() -> None:
                 {"1", "2", "3"},
             )
             sorted_requests = sort_requests(requests, sort_choice)
-            show_requests(sorted_requests, employees)
+            show_requests(sorted_requests)
 
         elif choice == "9":
             statistics = get_request_statistics(requests)

@@ -1,6 +1,8 @@
-"""Функции работы с кадровыми заявлениями."""
+"""Класс заявления и функции работы с коллекцией заявлений."""
 
 from datetime import date
+
+from employees import Employee, find_employee_by_id
 
 
 REQUEST_TYPES = {
@@ -11,123 +13,168 @@ REQUEST_TYPES = {
 }
 
 
-def get_type_and_status(choice: str, age: int) -> tuple[str, str]:
-    """Определить тип заявления и его начальный статус."""
-    request_type = REQUEST_TYPES[choice]
+class Request:
+    """Кадровое заявление сотрудника."""
 
-    statuses = {
-        "1": "На согласовании у руководителя",
-        "2": "На согласовании у HR",
-        "3": "На согласовании у HR и руководителя",
-        "4": "На регистрации в HR",
-    }
-    status = statuses[choice]
+    def __init__(
+        self,
+        request_id: int,
+        employee: Employee,
+        request_type: str,
+        status: str,
+        request_date: str,
+    ) -> None:
+        """Создать объект заявления, связав его с объектом сотрудника."""
+        self.id = request_id
+        self.employee = employee
+        self.type = request_type
+        self.status = status
+        self.date = request_date
 
-    if age < 18:
-        status = "Отклонено: сотрудник младше 18 лет"
-    elif age > 70:
-        status = "Требуется дополнительная проверка (возраст > 70)"
+    def __str__(self) -> str:
+        """Вернуть строковое представление заявления."""
+        return (
+            f"№ {self.id} | "
+            f"ФИО: {self.employee.fio} | "
+            f"Тип: {self.type} | "
+            f"Дата: {self.date} | "
+            f"Статус: {self.status}"
+        )
 
-    return request_type, status
+    @staticmethod
+    def resolve_type_and_status(
+        choice: str,
+        employee_age: int,
+    ) -> tuple[str, str]:
+        """Определить тип заявления и его начальный статус."""
+        request_type = REQUEST_TYPES[choice]
+
+        statuses = {
+            "1": "На согласовании у руководителя",
+            "2": "На согласовании у HR",
+            "3": "На согласовании у HR и руководителя",
+            "4": "На регистрации в HR",
+        }
+        status = statuses[choice]
+
+        if employee_age < 18:
+            status = "Отклонено: сотрудник младше 18 лет"
+        elif employee_age > 70:
+            status = "Требуется дополнительная проверка (возраст > 70)"
+
+        return request_type, status
+
+    def to_dict(self) -> dict:
+        """Преобразовать заявление в структуру для сохранения в JSON."""
+        return {
+            "id": self.id,
+            "employee_id": self.employee.id,
+            "type": self.type,
+            "status": self.status,
+            "date": self.date,
+        }
+
+    @classmethod
+    def from_data(
+        cls,
+        data: dict,
+        employees: list[Employee],
+    ) -> "Request | None":
+        """Создать заявление из данных JSON, связав его с сотрудником.
+
+        Если сотрудник с указанным ID не найден, заявление
+        не создаётся (возвращается None).
+        """
+        employee = find_employee_by_id(employees, data["employee_id"])
+        if employee is None:
+            return None
+        return cls(
+            data["id"],
+            employee,
+            data["type"],
+            data["status"],
+            data["date"],
+        )
 
 
-def get_next_request_id(requests: list[dict]) -> int:
+def get_next_request_id(requests: list[Request]) -> int:
     """Вернуть следующий свободный номер заявления."""
     if not requests:
         return 1
-    return max(request["id"] for request in requests) + 1
+    return max(request.id for request in requests) + 1
 
 
 def create_request(
-    requests: list[dict],
-    employees: list[dict],
+    requests: list[Request],
+    employees: list[Employee],
     employee_id: int,
     choice: str,
-) -> dict:
+) -> Request:
     """Создать заявление для существующего сотрудника."""
-    employee = next(
-        (item for item in employees if item["id"] == employee_id),
-        None,
-    )
+    employee = find_employee_by_id(employees, employee_id)
     if employee is None:
         raise ValueError("Сотрудник с таким ID не найден.")
 
-    request_type, status = get_type_and_status(choice, employee["age"])
-    request = {
-        "id": get_next_request_id(requests),
-        "employee_id": employee_id,
-        "type": request_type,
-        "status": status,
-        "date": date.today().isoformat(),
-    }
+    request_type, status = Request.resolve_type_and_status(
+        choice,
+        employee.age,
+    )
+    request = Request(
+        get_next_request_id(requests),
+        employee,
+        request_type,
+        status,
+        date.today().isoformat(),
+    )
     requests.append(request)
     return request
 
 
-def cancel_request(requests: list[dict], request_id: int) -> None:
+def cancel_request(requests: list[Request], request_id: int) -> None:
     """Удалить заявление по его номеру."""
     for request in requests:
-        if request["id"] == request_id:
+        if request.id == request_id:
             requests.remove(request)
             return
     raise ValueError("Заявление с таким номером не найдено.")
 
 
-def find_requests(
-    requests: list[dict],
-    employees: list[dict],
-    query: str,
-) -> list[dict]:
-    """Найти заявления по ФИО, типу или статусу."""
+def find_requests(requests: list[Request], query: str) -> list[Request]:
+    """Найти заявления по ФИО сотрудника, типу или статусу."""
     query = query.lower()
-    employee_map = {employee["id"]: employee for employee in employees}
-    result = []
-
-    for request in requests:
-        employee = employee_map.get(request["employee_id"], {})
-        fio = employee.get("fio", "")
-        if (
-            query in fio.lower()
-            or query in request["type"].lower()
-            or query in request["status"].lower()
-        ):
-            result.append(request)
-
-    return result
+    return [
+        request
+        for request in requests
+        if query in request.employee.fio.lower()
+        or query in request.type.lower()
+        or query in request.status.lower()
+    ]
 
 
-def sort_requests(requests: list[dict], sort_choice: str) -> list[dict]:
+def sort_requests(requests: list[Request], sort_choice: str) -> list[Request]:
     """Вернуть заявления, отсортированные выбранным способом."""
     keys = {
-        "1": lambda request: request["date"],
-        "2": lambda request: request["type"],
-        "3": lambda request: request["status"],
+        "1": lambda request: request.date,
+        "2": lambda request: request.type,
+        "3": lambda request: request.status,
     }
     return sorted(requests, key=keys[sort_choice])
 
 
-def get_request_statistics(requests: list[dict]) -> dict[str, int]:
+def get_request_statistics(requests: list[Request]) -> dict[str, int]:
     """Сформировать статистику заявлений по типам."""
     statistics = {request_type: 0 for request_type in REQUEST_TYPES.values()}
     for request in requests:
-        statistics[request["type"]] += 1
+        statistics[request.type] += 1
     return statistics
 
 
-def show_requests(requests: list[dict], employees: list[dict]) -> None:
+def show_requests(requests: list[Request]) -> None:
     """Вывести заявления на экран."""
     if not requests:
         print("Заявления не найдены.")
         return
 
-    employee_map = {employee["id"]: employee for employee in employees}
     print("\n=== ЗАЯВЛЕНИЯ ===")
     for request in requests:
-        employee = employee_map.get(request["employee_id"], {})
-        print(
-            f"№ {request['id']} | "
-            f"ФИО: {employee.get('fio', 'Неизвестно')} | "
-            f"Тип: {request['type']} | "
-            f"Дата: {request['date']} | "
-            f"Статус: {request['status']}"
-        )
+        print(request)
