@@ -1,0 +1,2 @@
+
+"""HR requests Django application."""
