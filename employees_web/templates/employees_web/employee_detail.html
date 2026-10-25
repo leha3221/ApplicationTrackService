@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {% if employee %}{{ employee.fio }}{% else %}Сотрудник не найден{% endif %}
+    — Кадровый сервис
+{% endblock %}
+
+{% block content %}
+{% if employee %}
+    <p class="eyebrow">Карточка сотрудника № {{ employee.id }}</p>
+    <h1>{{ employee.fio|default:"ФИО не указано" }}</h1>
+    <dl class="detail-list row">
+        <dt class="col-sm-3">Подразделение</dt>
+        <dd class="col-sm-9">{{ employee.department|default:"Не указано" }}</dd>
+        <dt class="col-sm-3">Возраст</dt>
+        <dd class="col-sm-9">{{ employee.age }}</dd>
+    </dl>
+{% else %}
+    <section class="empty-state">
+        <p class="eyebrow">Ошибка 404</p>
+        <h1>Сотрудник не найден</h1>
+        <p>Сотрудника с таким идентификатором нет в справочнике.</p>
+    </section>
+{% endif %}
+<a class="btn btn-outline-primary mt-3" href="{% url 'employees:list' %}">
+    К списку сотрудников
+</a>
+{% endblock %}

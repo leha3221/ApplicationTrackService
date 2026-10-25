@@ -1,0 +1,13 @@
+{% if "отклон" in item.status|lower %}
+    <span class="badge rounded-pill text-bg-danger request-status request-status-rejected">
+        {{ item.status|default:"Статус не указан" }}
+    </span>
+{% elif "одобр" in item.status|lower or "принят" in item.status|lower %}
+    <span class="badge rounded-pill text-bg-success request-status request-status-approved">
+        {{ item.status|default:"Статус не указан" }}
+    </span>
+{% else %}
+    <span class="badge rounded-pill text-bg-warning request-status request-status-pending">
+        {{ item.status|default:"Статус не указан" }}
+    </span>
+{% endif %}

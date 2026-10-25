@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Заявления — Кадровый сервис{% endblock %}
+
+{% block content %}
+<div class="section-heading">
+    <div>
+        <p class="eyebrow">Кадровый документооборот</p>
+        <h1>Заявления</h1>
+    </div>
+    <span class="count-badge">Найдено: {{ requests|length }}</span>
+</div>
+
+<form class="search-form" method="get" action="{% url 'applications:list' %}">
+    <label class="visually-hidden" for="request-search">
+        Поиск по сотруднику, типу или статусу
+    </label>
+    <input
+        class="form-control"
+        id="request-search"
+        name="q"
+        value="{{ query }}"
+        placeholder="ФИО, тип или статус"
+    >
+    <button class="btn btn-primary" type="submit">Найти</button>
+    {% if query %}
+        <a class="btn btn-outline-secondary" href="{% url 'applications:list' %}">
+            Сбросить
+        </a>
+    {% endif %}
+</form>
+
+<div class="request-list">
+    {% for item in requests %}
+        {% include "applications/includes/request_card.html" %}
+    {% empty %}
+        <p class="empty-message">Заявления не найдены.</p>
+    {% endfor %}
+</div>
+{% endblock %}

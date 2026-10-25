@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block title %}Главная — Кадровый сервис{% endblock %}
+
+{% block content %}
+<section class="hero-panel">
+    <p class="eyebrow">Application Track Service</p>
+    <h1 class="display-5">Сервис учёта кадровых заявлений</h1>
+    <p class="lead">
+        Просматривайте сотрудников организации и отслеживайте поданные заявления.
+    </p>
+</section>
+
+<section aria-labelledby="sections-heading">
+    <h2 id="sections-heading" class="h3 mb-3">Разделы системы</h2>
+    <div class="row g-4">
+        <div class="col-md-6">
+            <article class="card overview-card h-100">
+                <div class="card-body">
+                    <h3 class="h5">Сотрудники</h3>
+                    <p>В базе: {{ employees_count|default:"0" }}</p>
+                    <a class="btn btn-primary" href="{% url 'employees:list' %}">
+                        Перейти к сотрудникам
+                    </a>
+                </div>
+            </article>
+        </div>
+        <div class="col-md-6">
+            <article class="card overview-card h-100">
+                <div class="card-body">
+                    <h3 class="h5">Кадровые заявления</h3>
+                    <p>В базе: {{ requests_count|default:"0" }}</p>
+                    <a class="btn btn-secondary" href="{% url 'applications:list' %}">
+                        Перейти к заявлениям
+                    </a>
+                </div>
+            </article>
+        </div>
+    </div>
+</section>
+{% endblock %}

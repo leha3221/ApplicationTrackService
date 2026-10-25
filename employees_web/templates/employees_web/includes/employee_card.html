@@ -1,0 +1,14 @@
+<article class="card employee-card h-100">
+    <div class="card-body">
+        <p class="eyebrow">Сотрудник № {{ employee.id }}</p>
+        <h2 class="h5 card-title">{{ employee.fio|default:"ФИО не указано" }}</h2>
+        <p class="card-text">
+            Подразделение: {{ employee.department|default:"Не указано" }}
+        </p>
+        <p class="card-text">Возраст: {{ employee.age }}</p>
+        <a class="btn btn-outline-primary"
+           href="{% url 'employees:detail' employee.id %}">
+            Открыть карточку
+        </a>
+    </div>
+</article>

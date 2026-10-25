@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {% if item %}Заявление № {{ item.id }}{% else %}Заявление не найдено{% endif %}
+    — Кадровый сервис
+{% endblock %}
+
+{% block content %}
+{% if item %}
+    <p class="eyebrow">Карточка заявления</p>
+    <div class="section-heading">
+        <h1>Заявление № {{ item.id }}</h1>
+        {% include "applications/includes/request_status.html" %}
+    </div>
+    <dl class="detail-list row">
+        <dt class="col-sm-3">Сотрудник</dt>
+        <dd class="col-sm-9">
+            <a href="{% url 'employees:detail' item.employee.id %}">
+                {{ item.employee.fio|default:"Не указан" }}
+            </a>
+        </dd>
+        <dt class="col-sm-3">Подразделение</dt>
+        <dd class="col-sm-9">{{ item.employee.department|default:"Не указано" }}</dd>
+        <dt class="col-sm-3">Тип заявления</dt>
+        <dd class="col-sm-9">{{ item.type|default:"Не указан" }}</dd>
+        <dt class="col-sm-3">Дата подачи</dt>
+        <dd class="col-sm-9">{{ item.date|default:"Не указана" }}</dd>
+    </dl>
+{% else %}
+    <section class="empty-state">
+        <p class="eyebrow">Ошибка 404</p>
+        <h1>Заявление не найдено</h1>
+        <p>Заявления с таким номером нет в системе.</p>
+    </section>
+{% endif %}
+<a class="btn btn-outline-primary mt-3" href="{% url 'applications:list' %}">
+    К списку заявлений
+</a>
+{% endblock %}
