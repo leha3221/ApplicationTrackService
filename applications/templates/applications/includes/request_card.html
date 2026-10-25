@@ -10,8 +10,8 @@
         </div>
         <p class="mb-1">
             Сотрудник:
-            <a href="{% url 'employees:detail' item.employee.id %}">
-                {{ item.employee.fio|default:"Не указан" }}
+            <a href="{% url 'employees:detail' item.employee_id %}">
+                {{ item.employee_fio|default:"Не указан" }}
             </a>
         </p>
         <p class="mb-1">Тип: {{ item.type|default:"Не указан" }}</p>

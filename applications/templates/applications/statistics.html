@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block title %}Статистика — Кадровый сервис{% endblock %}
+
+{% block content %}
+<p class="eyebrow">Сводные SQL-отчёты</p>
+<h1 class="mb-4">Статистика</h1>
+
+<div class="row g-4">
+    <section class="col-lg-6" aria-labelledby="category-stats-heading">
+        <h2 id="category-stats-heading" class="h4">Заявления по типам</h2>
+        <div class="table-responsive">
+            <table class="table table-striped align-middle">
+                <thead><tr><th>Тип</th><th>Количество</th></tr></thead>
+                <tbody>
+                    {% for row in categories %}
+                        <tr><td>{{ row.type }}</td><td>{{ row.request_count }}</td></tr>
+                    {% empty %}
+                        <tr><td colspan="2">Нет данных.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="col-lg-6" aria-labelledby="status-stats-heading">
+        <h2 id="status-stats-heading" class="h4">Заявления по статусам</h2>
+        <div class="table-responsive">
+            <table class="table table-striped align-middle">
+                <thead><tr><th>Статус</th><th>Количество</th></tr></thead>
+                <tbody>
+                    {% for row in statuses %}
+                        <tr><td>{{ row.status }}</td><td>{{ row.request_count }}</td></tr>
+                    {% empty %}
+                        <tr><td colspan="2">Нет данных.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="col-lg-6" aria-labelledby="department-stats-heading">
+        <h2 id="department-stats-heading" class="h4">Сотрудники по подразделениям</h2>
+        <div class="table-responsive">
+            <table class="table table-striped align-middle">
+                <thead><tr><th>Подразделение</th><th>Сотрудники</th><th>Средний возраст</th></tr></thead>
+                <tbody>
+                    {% for row in departments %}
+                        <tr>
+                            <td>{{ row.department }}</td>
+                            <td>{{ row.employee_count }}</td>
+                            <td>{{ row.average_age|floatformat:1 }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr><td colspan="3">Нет данных.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="col-lg-6" aria-labelledby="request-department-heading">
+        <h2 id="request-department-heading" class="h4">Заявления по подразделениям</h2>
+        <form class="search-form" method="get" action="{% url 'applications:statistics' %}">
+            <label for="min-requests">Показывать подразделения с числом заявлений больше:</label>
+            <input class="form-control" type="number" min="0" id="min-requests"
+                   name="min_requests" value="{{ minimum }}">
+            <button class="btn btn-primary" type="submit">Применить</button>
+        </form>
+        <div class="table-responsive">
+            <table class="table table-striped align-middle">
+                <thead><tr><th>Подразделение</th><th>Всего заявлений</th></tr></thead>
+                <tbody>
+                    {% for row in busy_departments %}
+                        <tr><td>{{ row.department }}</td><td>{{ row.request_count }}</td></tr>
+                    {% empty %}
+                        <tr><td colspan="2">Подходящих подразделений нет.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>
+{% endblock %}

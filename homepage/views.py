@@ -1,29 +1,17 @@
 """Home page and shared HTML page frame."""
 
-from pathlib import Path
-
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
 
-from employees import Employee
-from requests import Request
-from storage import load_employees, load_requests
-
-
-BASE_DIR = Path(__file__).resolve().parent.parent
+from db.database import query_one
 
 
 def index(request: HttpRequest) -> HttpResponse:
     """Show the project overview with counts from the JSON files."""
-    employees: list[Employee] = load_employees(
-        BASE_DIR / "data" / "employees.json"
-    )
-    requests: list[Request] = load_requests(
-        BASE_DIR / "data" / "requests.json", employees
-    )
+    counts = query_one("dashboard_counts")
     context = {
-        "employees_count": len(employees),
-        "requests_count": len(requests),
+        "employees_count": counts["employees_count"],
+        "requests_count": counts["requests_count"],
     }
     return render(request, "homepage/index.html", context)
 

@@ -1,35 +1,33 @@
 """Web views for employees, using the project's JSON storage."""
 
-from pathlib import Path
-
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
 
-from employees import Employee, find_employee_by_id, find_employees
-from storage import load_employees
-
-
-BASE_DIR = Path(__file__).resolve().parent.parent
+from db.database import query_all, query_one
 
 
 def employee_list(request: HttpRequest) -> HttpResponse:
-    employees: list[Employee] = load_employees(
-        BASE_DIR / "data" / "employees.json"
-    )
     query = request.GET.get("q", "").strip()
     if query:
-        employees = find_employees(employees, query)
+        employees = query_all("employee_search", (query, query))
+    else:
+        employees = query_all("employee_list")
 
     context = {"employees": employees, "query": query}
     return render(request, "employees_web/employee_list.html", context)
 
 
 def employee_detail(request: HttpRequest, employee_id: int) -> HttpResponse:
-    employees: list[Employee] = load_employees(
-        BASE_DIR / "data" / "employees.json"
+    employee = query_one("employee_detail", (employee_id,))
+    employee_requests = (
+        query_all("employee_requests", (employee_id,))
+        if employee is not None
+        else []
     )
-    employee = find_employee_by_id(employees, employee_id)
-    context = {"employee": employee}
+    context = {
+        "employee": employee,
+        "requests": employee_requests,
+    }
     return render(
         request,
         "employees_web/employee_detail.html",
