@@ -7,14 +7,7 @@
 
 {% block content %}
 {% if employee %}
-    <p class="eyebrow">Карточка сотрудника № {{ employee.id }}</p>
-    <h1>{{ employee.fio|default:"ФИО не указано" }}</h1>
-    <dl class="detail-list row">
-        <dt class="col-sm-3">Подразделение</dt>
-        <dd class="col-sm-9">{{ employee.department|default:"Не указано" }}</dd>
-        <dt class="col-sm-3">Возраст</dt>
-        <dd class="col-sm-9">{{ employee.age }}</dd>
-    </dl>
+    {% include "employees_web/includes/employee_card.html" with show_open_link=False %}
 <section class="mt-4" aria-labelledby="employee-requests-heading">
     <h2 id="employee-requests-heading" class="h4">Заявления сотрудника</h2>
     {% for item in requests %}

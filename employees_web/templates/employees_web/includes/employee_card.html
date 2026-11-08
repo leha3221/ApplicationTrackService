@@ -6,9 +6,11 @@
             Подразделение: {{ employee.department|default:"Не указано" }}
         </p>
         <p class="card-text">Возраст: {{ employee.age }}</p>
-        <a class="btn btn-outline-primary"
-           href="{% url 'employees:detail' employee.id %}">
-            Открыть карточку
-        </a>
+        {% if show_open_link != False %}
+            <a class="btn btn-outline-primary"
+               href="{% url 'employees:detail' employee.id %}">
+                Открыть карточку
+            </a>
+        {% endif %}
     </div>
 </article>
