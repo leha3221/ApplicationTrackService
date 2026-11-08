@@ -11,10 +11,10 @@
         <p class="mb-1">
             Сотрудник:
             <a href="{% url 'employees:detail' item.employee_id %}">
-                {{ item.employee_fio|default:"Не указан" }}
+                {{ item.employee.fio|default:"Не указан" }}
             </a>
         </p>
-        <p class="mb-1">Тип: {{ item.type|default:"Не указан" }}</p>
-        <p class="text-muted mb-0">Дата: {{ item.date|default:"Не указана" }}</p>
+        <p class="mb-1">Тип: {{ item.category.name|default:"Не указан" }}</p>
+        <p class="text-muted mb-0">Дата: {{ item.date|date:"d.m.Y" }}</p>
     </div>
 </article>

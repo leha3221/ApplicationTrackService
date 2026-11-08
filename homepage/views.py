@@ -1,17 +1,19 @@
-"""Home page and shared HTML page frame."""
-
+from django.db.models import Count
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
 
-from db.database import query_one
+from applications.models import Request, Status
+from employees_web.models import Employee
 
 
 def index(request: HttpRequest) -> HttpResponse:
-    """Show the project overview with counts from the JSON files."""
-    counts = query_one("dashboard_counts")
+    employee_count = Employee.objects.aggregate(total=Count("pk"))["total"]
+    request_count = Request.objects.aggregate(total=Count("pk"))["total"]
+    status_stats = Status.objects.annotate(request_count=Count("requests"))
     context = {
-        "employees_count": counts["employees_count"],
-        "requests_count": counts["requests_count"],
+        "employees_count": employee_count,
+        "requests_count": request_count,
+        "status_stats": status_stats,
     }
     return render(request, "homepage/index.html", context)
 
@@ -20,9 +22,4 @@ def page_not_found(
     request: HttpRequest,
     exception: Exception,
 ) -> HttpResponse:
-    """Return the project's 404 page."""
-    return render(
-        request,
-        "homepage/404.html",
-        status=404,
-    )
+    return render(request, "homepage/404.html", status=404)

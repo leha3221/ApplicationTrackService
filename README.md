@@ -328,3 +328,35 @@ python -m db.import_json
 Исходные JSON-файлы и консольная версия сохранены. Изменения данных консольной
 версии не синхронизируются с SQLite автоматически: после обновления JSON повтори
 импорт командой выше.
+
+## ПР9: модели Django и ORM
+
+Веб-слой использует Django ORM-модели из `employees_web/models.py` и
+`applications/models.py`. `Request` связан внешними ключами с `Employee`,
+`Category` и `Status`, для связанных записей задано `on_delete=PROTECT`.
+Миграции находятся в каталогах приложений.
+
+База ПР7 `data/application_track.sqlite` остаётся неизменяемым источником
+данных. Django использует `db.sqlite3` как целевую БД. После установки
+зависимостей создайте схему и перенесите записи:
+
+```powershell
+python manage.py migrate
+python manage.py import_pr7_data
+python manage.py runserver
+```
+
+Команда `import_pr7_data` сохраняет идентификаторы и связи и допускает
+повторный запуск. Django-представления используют ORM-поиск и фильтры,
+сортировку, `select_related()`, `prefetch_related()`, агрегирование и
+постраничный вывод. SQL-файлы сохранены как материалы ПР7.
+
+Проверка проекта:
+
+```powershell
+python manage.py check
+python manage.py makemigrations --check
+python manage.py showmigrations
+pytest -v
+flake8 . --extend-exclude=.venv
+```
