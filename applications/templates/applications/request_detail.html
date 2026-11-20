@@ -12,19 +12,30 @@
         <h1>Заявление № {{ item.id }}</h1>
         {% include "applications/includes/request_status.html" %}
     </div>
+    {% if item.status_id != "7" %}
+        <div class="d-flex gap-2 mb-3">
+            <a class="btn btn-outline-primary" href="{% url 'applications:update' item.id %}">Редактировать</a>
+            <form method="post" action="{% url 'applications:withdraw' item.id %}">
+                {% csrf_token %}
+                <button class="btn btn-outline-danger" type="submit">Отозвать заявление</button>
+            </form>
+        </div>
+    {% endif %}
     <dl class="detail-list row">
         <dt class="col-sm-3">Сотрудник</dt>
         <dd class="col-sm-9">
-            <a href="{% url 'employees:detail' item.employee.id %}">
+            <a href="{% url 'employees:detail' item.employee_id %}">
                 {{ item.employee.fio|default:"Не указан" }}
             </a>
         </dd>
         <dt class="col-sm-3">Подразделение</dt>
         <dd class="col-sm-9">{{ item.employee.department|default:"Не указано" }}</dd>
+        <dt class="col-sm-3">Возраст сотрудника</dt>
+        <dd class="col-sm-9">{{ item.employee.age }}</dd>
         <dt class="col-sm-3">Тип заявления</dt>
-        <dd class="col-sm-9">{{ item.type|default:"Не указан" }}</dd>
+        <dd class="col-sm-9">{{ item.category.name|default:"Не указан" }}</dd>
         <dt class="col-sm-3">Дата подачи</dt>
-        <dd class="col-sm-9">{{ item.date|default:"Не указана" }}</dd>
+        <dd class="col-sm-9">{{ item.date|date:"d.m.Y" }}</dd>
     </dl>
 {% else %}
     <section class="empty-state">

@@ -9,7 +9,7 @@
                 width="36"
                 height="36"
             >
-            <span>Кадровый сервис</span>
+            <span>Кадровый</span>
         </a>
         <button
             class="navbar-toggler"
@@ -27,6 +27,10 @@
                 <a class="nav-link" href="{% url 'homepage:index' %}">Главная</a>
                 <a class="nav-link" href="{% url 'employees:list' %}">Сотрудники</a>
                 <a class="nav-link" href="{% url 'applications:list' %}">Заявления</a>
+                <a class="nav-link" href="{% url 'applications:create' %}">Новое заявление</a>
+                <a class="nav-link" href="{% url 'applications:statistics' %}">
+                    Статистика
+                </a>
             </div>
         </div>
     </div>

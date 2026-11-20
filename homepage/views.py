@@ -1,29 +1,19 @@
-"""Home page and shared HTML page frame."""
-
-from pathlib import Path
-
+from django.db.models import Count
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
 
-from employees import Employee
-from requests import Request
-from storage import load_employees, load_requests
-
-
-BASE_DIR = Path(__file__).resolve().parent.parent
+from applications.models import Request, Status
+from employees_web.models import Employee
 
 
 def index(request: HttpRequest) -> HttpResponse:
-    """Show the project overview with counts from the JSON files."""
-    employees: list[Employee] = load_employees(
-        BASE_DIR / "data" / "employees.json"
-    )
-    requests: list[Request] = load_requests(
-        BASE_DIR / "data" / "requests.json", employees
-    )
+    employee_count = Employee.objects.aggregate(total=Count("pk"))["total"]
+    request_count = Request.objects.aggregate(total=Count("pk"))["total"]
+    status_stats = Status.objects.annotate(request_count=Count("requests"))
     context = {
-        "employees_count": len(employees),
-        "requests_count": len(requests),
+        "employees_count": employee_count,
+        "requests_count": request_count,
+        "status_stats": status_stats,
     }
     return render(request, "homepage/index.html", context)
 
@@ -32,9 +22,4 @@ def page_not_found(
     request: HttpRequest,
     exception: Exception,
 ) -> HttpResponse:
-    """Return the project's 404 page."""
-    return render(
-        request,
-        "homepage/404.html",
-        status=404,
-    )
+    return render(request, "homepage/404.html", status=404)
