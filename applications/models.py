@@ -3,6 +3,18 @@ from django.db import models
 from employees_web.models import Employee
 
 
+class RequestQuerySet(models.QuerySet):
+    def active(self):
+        """Requests still being processed, including additional review."""
+        return self.exclude(status_id__in=("5", Status.WITHDRAWN_CODE))
+
+    def rejected(self):
+        return self.filter(status_id="5")
+
+    def withdrawn(self):
+        return self.filter(status_id=Status.WITHDRAWN_CODE)
+
+
 class Category(models.Model):
     code = models.CharField(
         max_length=12, primary_key=True, verbose_name="Код"
@@ -21,6 +33,8 @@ class Category(models.Model):
 
 
 class Status(models.Model):
+    WITHDRAWN_CODE = "7"
+
     code = models.CharField(
         max_length=12, primary_key=True, verbose_name="Код"
     )
@@ -38,6 +52,8 @@ class Status(models.Model):
 
 
 class Request(models.Model):
+    objects = RequestQuerySet.as_manager()
+
     employee = models.ForeignKey(
         Employee,
         on_delete=models.PROTECT,

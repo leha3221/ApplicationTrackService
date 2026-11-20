@@ -2,6 +2,10 @@ from django.contrib import admin
 
 from .models import Category, Request, Status
 
+admin.site.site_header = "Кадровый сервис — администрирование"
+admin.site.site_title = "Кадровый сервис"
+admin.site.index_title = "Управление кадровыми данными"
+
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
@@ -21,3 +25,6 @@ class RequestAdmin(admin.ModelAdmin):
     list_filter = ("category", "status", "date")
     search_fields = ("employee__fio", "category__name", "status__name")
     list_select_related = ("employee", "category", "status")
+    date_hierarchy = "date"
+    ordering = ("-date", "-id")
+    list_per_page = 25

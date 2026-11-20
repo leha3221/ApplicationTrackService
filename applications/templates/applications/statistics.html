@@ -6,6 +6,21 @@
 <p class="eyebrow">Сводные ORM-отчёты</p>
 <h1 class="mb-4">Статистика</h1>
 
+<div class="row g-3 mb-4">
+    <div class="col-md-6">
+        <div class="card"><div class="card-body">
+            <h2 class="h6">Заявления в работе</h2>
+            <p class="display-6 mb-0">{{ active_request_count }}</p>
+        </div></div>
+    </div>
+    <div class="col-md-6">
+        <div class="card"><div class="card-body">
+            <h2 class="h6">Отозванные заявления</h2>
+            <p class="display-6 mb-0">{{ withdrawn_request_count }}</p>
+        </div></div>
+    </div>
+</div>
+
 <div class="row g-4">
     <section class="col-lg-6" aria-labelledby="category-stats-heading">
         <h2 id="category-stats-heading" class="h4">Заявления по типам</h2>

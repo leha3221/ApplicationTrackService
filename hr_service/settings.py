@@ -1,5 +1,6 @@
 """Settings for the кадровые заявления Django project."""
 
+from importlib.util import find_spec
 from pathlib import Path
 
 
@@ -7,6 +8,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-local-development-key"
 DEBUG = True
 ALLOWED_HOSTS = ["localhost", "127.0.0.1", "testserver"]
+INTERNAL_IPS = ["127.0.0.1"]
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -19,6 +21,9 @@ INSTALLED_APPS = [
     "employees_web",
     "applications",
 ]
+DEBUG_TOOLBAR_AVAILABLE = find_spec("debug_toolbar") is not None
+if DEBUG_TOOLBAR_AVAILABLE:
+    INSTALLED_APPS.append("debug_toolbar")
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -29,6 +34,8 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+if DEBUG_TOOLBAR_AVAILABLE:
+    MIDDLEWARE.insert(0, "debug_toolbar.middleware.DebugToolbarMiddleware")
 
 ROOT_URLCONF = "hr_service.urls"
 
